@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fatfractal.ffef.FFException;
 import com.fatfractal.ffef.FatFractal;
+import com.gap.android.fatfractal.adapter.MovieListAdapter;
 import com.gap.android.fatfractal.myapp.entity.Actors;
 import com.gap.android.fatfractal.myapp.entity.Movie;
 
@@ -12,13 +13,18 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.Menu;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnItemClickListener{
 	private FatFractal ff = MyBackend.getFF();	
 	private ProgressDialog mProgressDialog;
 	private List<Movie> movieArray;
@@ -41,8 +47,11 @@ public class MainActivity extends Activity {
 	
 	private void populateListView() {
 		ListView list = (ListView)findViewById(android.R.id.list);
-		ArrayAdapter<Movie> adapter = new ArrayAdapter<Movie>(this, android.R.layout.simple_list_item_1, movieArray);
+		MovieListAdapter adapter = new MovieListAdapter(this, movieArray);
+		//ArrayAdapter<Movie> adapter = new ArrayAdapter<Movie>(this, android.R.layout.simple_list_item_1, movieArray);
+		
 		list.setAdapter(adapter);	
+		list.setOnItemClickListener(this);
 	}
 	
 	private class LoadData extends AsyncTask<Void, Void, Void> {
@@ -60,6 +69,7 @@ public class MainActivity extends Activity {
 		protected Void doInBackground(Void... params) {
 			//Loading Actors
 			List<Actors> actorArray = null;
+			/*
 			try {
 				actorArray = ff.getArrayFromUri("/ff/resources/Actors");
 			} catch (FFException e) {
@@ -78,7 +88,7 @@ public class MainActivity extends Activity {
 						e.printStackTrace();
 					}					
 				}
-			}
+			}*/
 			//Loading movies
 			movieArray = null;
 			try {
@@ -166,6 +176,13 @@ public class MainActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> list, View view, int position, long arg3) {
+		Intent intent = new Intent(this, SimpleImageActivity.class);
+		intent.putExtra("image", this.movieArray.get(position).getImageData());
+		startActivity(intent);
 	}
 
 }
